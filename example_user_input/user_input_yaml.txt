@@ -1,0 +1,8 @@
+filterTables:
+  Diagnosis:
+    long_title: Pneumonia
+select:
+- Labs
+outcome:
+- Mortality
+
