@@ -9,8 +9,9 @@ getTable <- function(table_name, n=-1L) {
 
 # start with filtering:
 # we will provide functionality for filtering via:
-#     - Diagnoses based on icd9_code
-#     - Diagnoses based on diagnosis name
+#     - Diagnosis based on icd9_code
+#     - Diagnosis based on diagnosis name
+# TODO: anything else??
 
 if ('Diagnosis' %in% names(user_input$filterTables)) {
    # use diagnoses to get a list of subject_id and hadm_id that correspond to the requested diagnosis code
@@ -42,7 +43,8 @@ if ('Diagnosis' %in% names(user_input$filterTables)) {
 
 
 # now select:
-#     - labs
+#     - Labs (top N labs)
+#     - 
 
 if (any(user_input$select == 'Labs')) {
    labs <- getTable('LABEVENTS', n=50000)
