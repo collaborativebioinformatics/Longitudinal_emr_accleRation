@@ -1,29 +1,19 @@
 library(dplyr)
 library(yaml)
+library(tidyr)
+
 project_dir <- '/../mnt/project/'
 
-writeLines(as.yaml(list('filterTables' = list('Diagnosis' = list('long_title' = 'Pneumonia')),
-                        'select' = list('Labs'),
-                        'outcome' = list('Mortality'))),
-           'user_input_yaml.txt')
-
-user_input <- read_yaml(file = 'user_input_yaml.txt')
-
 getTable <- function(table_name, n=-1L) {
-   tibble(read.csv(file = paste0(project_dir, 'MIMIC/', table_name, '.csv'), 
-                   header=TRUE, sep=',', nrow=n))
+   tibble(read.csv(file = paste0(project_dir, 'MIMIC/', table_name, '.csv'), header=TRUE, sep=',', nrow=n))
 }
 
-top50bugs <- read.csv(paste0(project_dir, 'micro_top50.csv'))$org_name
-top50labs <- read.csv(paste0(project_dir, 'top50labs.csv'))$org_name
+# Read input files
+user_input <- read_yaml(paste0(project_dir, 'ip.txt'))
+admissions <- getTable('ADMISSIONS')
+patients <- getTable('PATIENTS')
+icustays <- getTable('ICUSTAYS')
 
-
-
-# start with filtering:
-# we will provide functionality for filtering via:
-#     - Diagnosis based on icd9_code
-#     - Diagnosis based on diagnosis name
-# TODO: anything else??
 
 if ('Diagnosis' %in% names(user_input$filterTables)) {
    # use diagnoses to get a list of subject_id and hadm_id that correspond to the requested diagnosis code
@@ -53,11 +43,6 @@ if ('Diagnosis' %in% names(user_input$filterTables)) {
    cohort <- dx[filter_rows, c('subject_id', 'hadm_id')]
 }
 
-
-# now select:
-#     - Labs (top N labs)
-#     - 
-
 if (any(user_input$select == 'Labs')) {
    labs <- getTable('LABEVENTS', n=50000)
    lab_names <- getTable('D_LABITEMS', n=50000)
@@ -75,8 +60,8 @@ if (any(user_input$select == 'Labs')) {
       x = labs, 
       y = lab_names %>% select(itemid, label), 
       by = join_by(itemid)
-   )
-   labs$label <- paste0('LAB_', gsub(' ', '', labs$label))
+   ) %>%
+      mutate(label = paste0('LAB_', gsub(' ', '', label)))
    
    # aggregate each lab per visit (hadm_id)
    labs <- labs %>% 
@@ -96,9 +81,53 @@ if (any(user_input$select == 'Labs')) {
    cohort <- labs
 }
 
+# metric1: mortality rate
+admissions <- admissions %>%
+    mutate(mortality_in_hospital = as.numeric(hospital_expire_flag))
 
-# TODO (Rishika): implement encoding outcomes (mortality, readmission, length of stay, etc.)
-# this data is in a bunch of different tables
+mortality_data <- admissions %>% 
+    select(subject_id, hadm_id, mortality_in_hospital)
 
+# metric2: readmission rate
+admissions <- admissions %>%
+  mutate(
+    admittime = as.POSIXct(admittime, format="%Y-%m-%d %H:%M:%S"),
+    dischtime = as.POSIXct(dischtime, format="%Y-%m-%d %H:%M:%S")
+  )
 
+readmission_data <- admissions %>%
+   arrange(subject_id, admittime) %>%  # Sort by patient and admission time
+   group_by(subject_id) %>%
+   mutate(
+      next_admit = lead(admittime),  # Next admission time
+      readmission = ifelse(!is.na(next_admit) & next_admit - dischtime <= 30, 1, 0)  # Readmission within 30 days
+   ) %>%
+   select(subject_id, hadm_id, readmission) %>%
+   ungroup()
 
+# metric3: length of stay (los)
+los_data <- admissions %>%
+   mutate(
+      los_days = as.numeric(difftime(dischtime, admittime, units = "days"))  # Compute LOS in days
+   ) %>%
+   select(subject_id, hadm_id, los_days)
+
+# metric4: icu transfers
+icu_transfers <- icustays %>%
+  group_by(subject_id, hadm_id) %>%
+  summarise(icu_transfers = n() - 1)  # Transfers occur when a patient moves to another ICU
+
+# merged metrics
+outcomes <- mortality_data %>%
+   left_join(readmission_data, by = c("subject_id", "hadm_id")) %>%
+   left_join(los_data, by = c("subject_id", "hadm_id")) %>%
+   left_join(icu_transfers, by = c("subject_id", "hadm_id"))
+
+cohort <- cohort %>%
+   left_join(outcomes, by = c("subject_id", "hadm_id"))
+
+# write modified/transformed dataframe to job directory
+write.csv(cohort, file = "parsed_input.csv", row.names = FALSE)
+
+# move that from job directory back to project directory
+system('dx upload parsed_input.csv --wait')
