@@ -15,6 +15,7 @@ patients <- getTable('PATIENTS')
 icustays <- getTable('ICUSTAYS')
 
 
+# filter down to requested cohort based on diagnosis
 if ('Diagnosis' %in% names(user_input$filterTables)) {
    # use diagnoses to get a list of subject_id and hadm_id that correspond to the requested diagnosis code
    # this data is in DIAGNOSES_ICD.csv
@@ -42,6 +43,11 @@ if ('Diagnosis' %in% names(user_input$filterTables)) {
    # filter down to the requested rows
    cohort <- dx[filter_rows, c('subject_id', 'hadm_id')]
 }
+
+# TODO: filter down other tables to subject_id's in this cohort
+# admissions, patients, icustays
+
+
 
 if (any(user_input$select == 'Labs')) {
    labs <- getTable('LABEVENTS', n=50000)
@@ -81,19 +87,23 @@ if (any(user_input$select == 'Labs')) {
    cohort <- labs
 }
 
+
+
+#### ENCODE OUTCOMES ####
+
 # metric1: mortality rate
 admissions <- admissions %>%
-    mutate(mortality_in_hospital = as.numeric(hospital_expire_flag))
+   mutate(mortality_in_hospital = as.numeric(hospital_expire_flag))
 
 mortality_data <- admissions %>% 
-    select(subject_id, hadm_id, mortality_in_hospital)
+   select(subject_id, hadm_id, mortality_in_hospital)
 
 # metric2: readmission rate
 admissions <- admissions %>%
-  mutate(
-    admittime = as.POSIXct(admittime, format="%Y-%m-%d %H:%M:%S"),
-    dischtime = as.POSIXct(dischtime, format="%Y-%m-%d %H:%M:%S")
-  )
+   mutate(
+      admittime = as.POSIXct(admittime, format="%Y-%m-%d %H:%M:%S"),
+      dischtime = as.POSIXct(dischtime, format="%Y-%m-%d %H:%M:%S")
+   )
 
 readmission_data <- admissions %>%
    arrange(subject_id, admittime) %>%  # Sort by patient and admission time
@@ -114,8 +124,8 @@ los_data <- admissions %>%
 
 # metric4: icu transfers
 icu_transfers <- icustays %>%
-  group_by(subject_id, hadm_id) %>%
-  summarise(icu_transfers = n() - 1)  # Transfers occur when a patient moves to another ICU
+   group_by(subject_id, hadm_id) %>%
+   summarise(icu_transfers = n() - 1)  # Transfers occur when a patient moves to another ICU
 
 # merged metrics
 outcomes <- mortality_data %>%
