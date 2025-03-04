@@ -1,10 +1,22 @@
+library(dplyr)
 library(yaml)
-setwd('~/Desktop/MIMIC/mimic-iii-clinical-database-carevue-subset-1.4/')
-user_input <- read_yaml(file = '~/Desktop/MIMIC/user_input_yaml.txt')
+project_dir <- '/../mnt/project/'
+
+writeLines(as.yaml(list('filterTables' = list('Diagnosis' = list('long_title' = 'Pneumonia')),
+                        'select' = list('Labs'),
+                        'outcome' = list('Mortality'))),
+           'user_input_yaml.txt')
+
+user_input <- read_yaml(file = 'user_input_yaml.txt')
 
 getTable <- function(table_name, n=-1L) {
-   tibble(read.csv(file = paste0('~/Desktop/MIMIC/mimic-iii-clinical-database-carevue-subset-1.4/', table_name, '.csv'), header=TRUE, sep=',', nrow=n))
+   tibble(read.csv(file = paste0(project_dir, 'MIMIC/', table_name, '.csv'), 
+                   header=TRUE, sep=',', nrow=n))
 }
+
+top50bugs <- read.csv(paste0(project_dir, 'micro_top50.csv'))$org_name
+top50labs <- read.csv(paste0(project_dir, 'top50labs.csv'))$org_name
+
 
 
 # start with filtering:
@@ -63,8 +75,8 @@ if (any(user_input$select == 'Labs')) {
       x = labs, 
       y = lab_names %>% select(itemid, label), 
       by = join_by(itemid)
-   ) %>%
-      mutate(label = paste0('LAB_', gsub(' ', '', label)))
+   )
+   labs$label <- paste0('LAB_', gsub(' ', '', labs$label))
    
    # aggregate each lab per visit (hadm_id)
    labs <- labs %>% 
