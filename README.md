@@ -42,3 +42,7 @@ More information regarding R installatin can be found [HERE](https://rstudio-edu
 `wget https://s01.oss.sonatype.org/content/repositories/releases/io/github/cmu-phil/causal-cmd/1.12.0/causal-cmd-1.12.0-jar-with-dependencies.jar`
 
 
+## Files Needed Prior to Pipeline 
+### YAML file to specify variables (eg specific columns) and specific arguments to input into Tetrad
+Please see 
+
