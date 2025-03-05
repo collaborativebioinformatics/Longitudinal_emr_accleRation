@@ -21,3 +21,12 @@ Tetrad [Tetrad](https://www.cmu.edu/dietrich/philosophy/tetrad/#:~:text=Tetrad%2
 ---
 ## Pipeline Workflow:
 ![Pipeline_NewFlowChart_03 25](https://github.com/user-attachments/assets/5b44d810-d4a6-4336-9daf-7fea3a0a4be9)
+
+
+
+----
+## Installation Process Prior 
+### Latest Java Version 
+sudo apt install openjdk-17-jdk
+
+More information regarding Java installation can be found HERE [HERE](https://www.java.com/en/download/help/download_options.html "HERE")
