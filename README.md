@@ -73,6 +73,57 @@ We tested use of our pipeline through data from the [MIMIC-III Dataset](https://
 # Results 
 ![example_output](https://github.com/user-attachments/assets/26955ac9-fa95-4e18-aa03-8bcd4e23dfdf)
 
+Results in example_output_name_out.txt
+
+================================================================================
+Graph Nodes:
+"LAB_AnionGap";"LAB_Bicarbonate";"LAB_Chloride";"LAB_Creatinine";"LAB_Glucose";"LAB_Potassium";"LAB_Sodium";"LAB_UreaNitrogen";"LAB_Basophils";"LAB_Eosinophils";"LAB_Hematocrit";"LAB_Hemoglobin";"LAB_INR.PT.";"LAB_Lymphocytes";"LAB_MCH";"LAB_MCHC";"LAB_MCV";"LAB_Monocytes";"LAB_Neutrophils";"LAB_PlateletCount";"LAB_PT";"LAB_PTT";"LAB_RDW";"LAB_RedBloodCells";"LAB_WhiteBloodCells";"LAB_Lactate";"LAB_AlanineAminotransferase.ALT.";"LAB_AlkalinePhosphatase";"LAB_AsparateAminotransferase.AST.";"LAB_Bilirubin.Total";"LAB_Calcium.Total";"LAB_Magnesium";"LAB_Phosphate";"LAB_BaseExcess";"LAB_CalculatedTotalCO2";"LAB_pCO2";"LAB_pH";"LAB_pO2";"LAB_Temperature";"LAB_CreatineKinase.CK.";"LAB_Oxygen";"mortality_in_hospital"
+
+Graph Edges:
+1. "LAB_AlkalinePhosphatase" o-> "LAB_Bilirubin.Total"
+2. "LAB_AlkalinePhosphatase" --> "LAB_Calcium.Total"
+3. "LAB_AlkalinePhosphatase" --> "LAB_Sodium"
+4. "LAB_AnionGap" <-> "LAB_Bicarbonate"
+5. "LAB_AnionGap" <-> "LAB_Creatinine"
+6. "LAB_AnionGap" <-> "LAB_Lactate"
+7. "LAB_AnionGap" <-> "LAB_Phosphate"
+8. "LAB_AsparateAminotransferase.AST." --> "LAB_AlanineAminotransferase.ALT."
+9. "LAB_Basophils" o-> "LAB_Eosinophils"
+10. "LAB_Bicarbonate" <-> "LAB_Chloride"
+11. "LAB_Bicarbonate" <-> "mortality_in_hospital"
+12. "LAB_Calcium.Total" <-> "LAB_CreatineKinase.CK."
+13. "LAB_Calcium.Total" --> "LAB_Lymphocytes"
+14. "LAB_Calcium.Total" <-> "LAB_Magnesium"
+15. "LAB_Calcium.Total" --> "LAB_Monocytes"
+16. "LAB_CalculatedTotalCO2" o-> "LAB_BaseExcess"
+17. "LAB_CalculatedTotalCO2" o-> "LAB_Bicarbonate"
+18. "LAB_CalculatedTotalCO2" o-> "LAB_pCO2"
+19. "LAB_Creatinine" <-> "LAB_UreaNitrogen"
+20. "LAB_Eosinophils" <-> "LAB_Neutrophils"
+21. "LAB_Eosinophils" <-> "LAB_PlateletCount"
+22. "LAB_Eosinophils" <-> "mortality_in_hospital"
+23. "LAB_Hematocrit" o-> "LAB_Hemoglobin"
+24. "LAB_Hematocrit" o-> "LAB_Phosphate"
+
+----
+# Interpretation of Results 
+A --> B
+present
+A is a cause of B. It may be a direct or indirect cause that may include other measured variables. Also, there may be an unmeasured confounder of A and B.
+absent
+B is not a cause of A.
+A <-> B
+present
+There is an unmeasured variable (call it L) that is a cause of A and B. There may be measured variables along the causal pathway from L to A or from L to B.
+absent
+A is not a cause of B. B is not a cause of A.
+ A o-> B
+present
+ Either A is a cause of B, or there is an unmeasured variable that is a cause of A and B, or both.
+ absent
+
+
+
 ----
 # Reproducibility and Future Directions 
 
