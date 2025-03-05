@@ -258,22 +258,22 @@ combine_outcome_feature_writecsv <- function(featDF, outDF, filename) {
 
 # TODO: change the filenames to something meaningful
 if (num_feat_sets == 1L && num_outcomes == 1L) {
-   combine_outcome_feature_writecsv(features_list[[1]], outcomes_list[[1]], 'option1')
+   combine_outcome_feature_writecsv(features_list[[1]], outcomes_list[[1]], 'step1_parsed_output')
    
 } else if (num_feat_sets > 1L && num_outcomes == 1L) {
    for (i in seq_along(features_list)) {
-      combine_outcome_feature_writecsv(features_list[[i]], outcomes_list[[1]], paste0('option',i))
+      combine_outcome_feature_writecsv(features_list[[i]], outcomes_list[[1]], paste0('step1_parsed_output_',i))
    }
    
 } else if (num_feat_sets == 1L && num_outcomes > 1L) {
    for (i in seq_along(outcomes_data)) {
-      combine_outcome_feature_writecsv(features_list[[1]], outcomes_list[[i]], paste0('option',i))
+      combine_outcome_feature_writecsv(features_list[[1]], outcomes_list[[i]], paste0('step1_parsed_output_',i))
    }
    
 } else if (num_feat_sets > 1L && num_outcomes > 1L) {
    for (i in seq_along(features_list)) {
       for (j in seq_along(outcomes_data)) {
-         combine_outcome_feature_writecsv(features_list[[i]], outcomes_list[[j]], paste0('option',i,'_',j))
+         combine_outcome_feature_writecsv(features_list[[i]], outcomes_list[[j]], paste0('step1_parsed_output_',i,'_',j))
       }
    }
 }
