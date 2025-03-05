@@ -1,6 +1,8 @@
 # Rapid Longitudinal Analysis of Public Health Data 
 ---
 This project was part of the March 2025 [CMU Hackathon](https://guides.library.cmu.edu/hackathon "CMU Hackathon") in partnership with [DNAnexus](https://www.dnanexus.com "DNAnexus").
+Hackathon Team: Samuel Blechman, Nicholas P. Cooley, Aung Myat Phyo, Ciara O'Donoghue, Glenn Ross-Dolan, Rebecca Satterwhite, Rishika Gupta
+
 
 ![DNANEXUSLOGO](https://github.com/user-attachments/assets/422aa273-195f-45f0-8bf0-4e846ded0d02)
 
@@ -20,6 +22,10 @@ Tetrad [Tetrad](https://www.cmu.edu/dietrich/philosophy/tetrad/#:~:text=Tetrad%2
 
 [See here for Tetrad User Manual](https://htmlpreview.github.io/?https:///github.com/cmu-phil/tetrad/blob/development/tetrad-lib/src/main/resources/docs/manual/index.html "See here for Tetrad User Manual")
 
+---
+
+## What is DNAnexus 
+[DNAnexus](https://www.dnanexus.com "DNAnexus")
  
 ---
 ## Pipeline Workflow:
