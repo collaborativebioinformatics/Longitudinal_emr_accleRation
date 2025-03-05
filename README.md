@@ -70,6 +70,10 @@ We tested use of our pipeline through data from the [MIMIC-III Dataset](https://
 
 --- 
 
+# Results 
+![example_output](https://github.com/user-attachments/assets/26955ac9-fa95-4e18-aa03-8bcd4e23dfdf)
+
+----
 # Reproducibility and Future Directions 
 
 This pipeline has the potential to be developed for the use of biological data (e.g. exploring causal relationships in a dataset with SNPs and gene expression). Furthermore, the use of principal component analysis may provide more efficiency to a large data set without as much user input. 
