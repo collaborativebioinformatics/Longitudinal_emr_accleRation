@@ -27,14 +27,14 @@ Tetrad [Tetrad](https://www.cmu.edu/dietrich/philosophy/tetrad/#:~:text=Tetrad%2
 ----
 ## Installation  
 ### Latest Java Version 
-sudo apt install openjdk-17-jdk
+`sudo apt install openjdk-17-jdk`
 
 More information regarding Java installation can be found [HERE](https://www.java.com/en/download/help/download_options.html "HERE")
 ***
 ### Latest R Versin 
-sudo apt install r-base
+`sudo apt install r-base`
 
 More information regarding R installatin can be found [HERE](https://rstudio-education.github.io/hopr/starting.html "HERE!") 
 ***
 ### .jar file for running Causaml-cmd on terminal (Tetrad command line option) 
-wget https://s01.oss.sonatype.org/content/repositories/releases/io/github/cmu-phil/causal-cmd/1.12.0/causal-cmd-1.12.0-jar-with-dependencies.jar
+`wget https://s01.oss.sonatype.org/content/repositories/releases/io/github/cmu-phil/causal-cmd/1.12.0/causal-cmd-1.12.0-jar-with-dependencies.jar`
