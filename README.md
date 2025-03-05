@@ -42,7 +42,7 @@ Tetrad [Tetrad](https://www.cmu.edu/dietrich/philosophy/tetrad/#:~:text=Tetrad%2
 
 More information regarding Java installation can be found [HERE](https://www.java.com/en/download/help/download_options.html "HERE")
 ***
-### Latest R Versin 
+### Latest R Version 
 `sudo apt install r-base`
 
 More information regarding R installatin can be found [HERE](https://rstudio-education.github.io/hopr/starting.html "HERE!") 
