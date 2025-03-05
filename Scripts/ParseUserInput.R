@@ -1,15 +1,24 @@
 library(dplyr)
 library(yaml)
 library(tidyr)
+library(RSQLite)
+library(DBI)
 
 project_dir <- '/../mnt/project/'
+
+# pull down SQLite database
+system('dx download mimic3.sqlite')
+conn001 <- dbConnect(SQLite(), 'mimic3.sqlite')
+
+# Read input files
+user_input <- read_yaml(paste0(project_dir, 'ip.txt'))
+
 
 getTable <- function(table_name, n=-1L) {
    tibble(read.csv(file = paste0(project_dir, 'MIMIC/', table_name, '.csv'), header=TRUE, sep=',', nrow=n))
 }
 
-# Read input files
-user_input <- read_yaml(paste0(project_dir, 'ip.txt'))
+
 admissions <- getTable('ADMISSIONS')
 patients <- getTable('PATIENTS')
 icustays <- getTable('ICUSTAYS')
@@ -18,30 +27,27 @@ icustays <- getTable('ICUSTAYS')
 # filter down to requested cohort based on diagnosis
 if ('Diagnosis' %in% names(user_input$filterTables)) {
    # use diagnoses to get a list of subject_id and hadm_id that correspond to the requested diagnosis code
-   # this data is in DIAGNOSES_ICD.csv
-   
-   # get all diagnosis subject_id, hadm_id, and icd9_code
-   dx <- getTable('DIAGNOSES_ICD')
    
    # get the user input data to define the diagnosis filtering criteria
    dx_filter_data <- user_input$filterTables$Diagnosis
    if ('icd9_code' %in% names(dx_filter_data)) { # user provided a specific diagnosis code = our lives are easy
-      filter_rows <- which(dx$icd9_code == dx_filter_data$icd9_code)
+      query <- paste0(
+         "SELECT subject_id, hadm_id
+         FROM DIAGNOSES_ICD
+         WHERE icd9_code = ", dx_filter_data$icd9_code
+      )
       
    } else if ('long_title' %in% names(dx_filter_data)) {
-      # get diagnosis names to code dictionary
-      dx_names <- getTable('D_ICD_DIAGNOSES')
-      # join with dx to get human readable names
-      dx <- left_join(
-         x = dx,
-         y = dx_names[c('icd9_code', 'long_title')],
-         by = join_by(icd9_code)
+      query <- paste0(
+         "SELECT subject_id, hadm_id
+         FROM DIAGNOSES_ICD
+         LEFT JOIN D_ICD_DIAGNOSES ON icd9_code
+         WHERE D_ICD_DIAGNOSES.long_title like '%", dx_filter_data$long_title, "%'"
       )
-      filter_rows <- grep(dx_filter_data$long_title, dx$long_title, ignore.case=TRUE)
    }
    
-   # filter down to the requested rows
-   cohort <- dx[filter_rows, c('subject_id', 'hadm_id')]
+   # use generated query to get necessary data
+   cohort <- dbGetQuery(conn001, query)
 }
 
 # TODO: filter down other tables to subject_id's in this cohort
@@ -141,3 +147,5 @@ write.csv(cohort, file = "parsed_input.csv", row.names = FALSE)
 
 # move that from job directory back to project directory
 system('dx upload parsed_input.csv --wait')
+
+dbDisconnect(conn)
