@@ -57,4 +57,11 @@ More information regarding R installatin can be found [HERE](https://rstudio-edu
 
 We tested use of our pipeline through data from the [MIMIC-III Dataset](https://mimic.mit.edu/ "MIMIC-III Dataset")[Johnson et al., 2022]. 
 
+--- 
+
+# Reproducibility 
+
+This pipeline has the potential to be developed for the use of biological data (e.g. exploring causal relationships in a dataset with SNPs and gene expression). Furthermore, the use of principal component analysis may provide more efficiency to a large data set without as much user input. 
+
+
 
