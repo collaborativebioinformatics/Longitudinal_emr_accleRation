@@ -42,7 +42,7 @@ More information regarding R installatin can be found [HERE](https://rstudio-edu
 `wget https://s01.oss.sonatype.org/content/repositories/releases/io/github/cmu-phil/causal-cmd/1.12.0/causal-cmd-1.12.0-jar-with-dependencies.jar`
 
 
-## Files Needed Prior to Pipeline 
+# Files Needed Prior to Pipeline 
 ### YAML file to specify variables (eg specific columns) and specific arguments to input into Tetrad
 
 #### Please see [Example User Input Folder](https://github.com/collaborativebioinformatics/Longitudinal_emr_accleRation/tree/main/example_user_input "Example User Input Folder") for example R script to output this file and example of file format. NOTE-examples of specific arguments and options can be found in the R script file. 
@@ -50,5 +50,10 @@ More information regarding R installatin can be found [HERE](https://rstudio-edu
 ### Knowledge File 
 
 ####To add knowledge parameters the user must create a `knowledge.txt` file. This option enables the user to input background knowledge regarding the data. For example. information about the time order of the measured variables. Please see ['knowledge.txt'](https://github.com/collaborativebioinformatics/Longitudinal_emr_accleRation/blob/main/example_user_input/knowledge.txt "knowledge.txt") for reference. 
+
+---
+#Testing
+
+We tested use of our pipeline through data from the [MIMIC-III Dataset](https://mimic.mit.edu/ "MIMIC-III Dataset")[Johnson et al., 2022]. 
 
 
