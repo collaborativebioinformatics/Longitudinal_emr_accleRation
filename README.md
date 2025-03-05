@@ -24,8 +24,10 @@ Tetrad [Tetrad](https://www.cmu.edu/dietrich/philosophy/tetrad/#:~:text=Tetrad%2
 
 ---
 
-## What is DNAnexus 
-[DNAnexus](https://www.dnanexus.com "DNAnexus")
+## What is [DNAnexus](https://www.dnanexus.com "DNAnexus") 
+
+![DNAnexususes](https://github.com/user-attachments/assets/82196058-035f-4e75-8c85-93d44c5939e1)
+
  
 ---
 ## Pipeline Workflow:
