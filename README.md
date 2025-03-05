@@ -52,7 +52,7 @@ More information regarding R installatin can be found [HERE](https://rstudio-edu
 ####To add knowledge parameters the user must create a `knowledge.txt` file. This option enables the user to input background knowledge regarding the data. For example. information about the time order of the measured variables. Please see ['knowledge.txt'](https://github.com/collaborativebioinformatics/Longitudinal_emr_accleRation/blob/main/example_user_input/knowledge.txt "knowledge.txt") for reference. 
 
 ---
-#Testing
+# Testing
 
 We tested use of our pipeline through data from the [MIMIC-III Dataset](https://mimic.mit.edu/ "MIMIC-III Dataset")[Johnson et al., 2022]. 
 
