@@ -1,5 +1,4 @@
-#CMU Libraries is hosting a collaborative hackathon in partnership with DNAnexus([link text itself]: https://www.dnanexus.com/) on the topic of machine learning and AI approaches to multimodal problems in computational biology. 
-
+#CMU Libraries is hosting a collaborative hackathon in partnership with (https://www.dnanexus.com/ 'DNAnexus') on the topic of machine learning and AI approaches to multimodal problems in computational biology.
 
 ![DNANEXUSLOGO](https://github.com/user-attachments/assets/422aa273-195f-45f0-8bf0-4e846ded0d02)
 
