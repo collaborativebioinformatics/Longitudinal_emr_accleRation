@@ -14,14 +14,33 @@ conn001 <- dbConnect(SQLite(), 'mimic3.sqlite')
 user_input <- read_yaml(paste0(project_dir, 'ip.txt'))
 
 
-getTable <- function(table_name, n=-1L) {
-   tibble(read.csv(file = paste0(project_dir, 'MIMIC/', table_name, '.csv'), header=TRUE, sep=',', nrow=n))
+getTableQuery <- function(table_name, columns, join_type='', join_table='', join_column='', filter_type='=', filter_column='', filter_value='', n=...) {
+   query <- paste0('SELECT ', columns, ' FROM ', table_name)
+   if (join_type != '' ) {
+      query <- paste0(query, ' ', join_type ,' JOIN ', join_table, ' ON ', join_column)
+   } 
+
+   if (filter_type != '') {
+      if (filter_type == 'IN') {
+         query <- paste0(query, ' WHERE ', filter_column, ' IN (', filter_value, ')')
+      } else if (filter_type == 'LIKE') {
+         query <- paste0(query, ' WHERE ', filter_column, " LIKE '%", filter_value, "%'")
+      } else {
+         query <- paste0(query, ' WHERE ', filter_column, ' = ', filter_value)
+      }
+   }
+
+   if(n != 0) {
+      query <- paste0(query, ' LIMIT ', n)
+   }
+   
+   return dbGetQuery(conn001, query)
 }
 
 
-admissions <- getTable('ADMISSIONS')
-patients <- getTable('PATIENTS')
-icustays <- getTable('ICUSTAYS')
+admissions <- getTableQuery(table_name='ADMISSIONS','subject_id, hadm_id, admittime, dischtime, hospital_expire_flag')
+patients <- getTableQuery(table_name='PATIENTS','subject_id')
+icustays <- getTableQuery(table_name='ICUSTAYS','subject_id, hadm_id')
 
 
 # filter down to requested cohort based on diagnosis
@@ -31,19 +50,10 @@ if ('Diagnosis' %in% names(user_input$filterTables)) {
    # get the user input data to define the diagnosis filtering criteria
    dx_filter_data <- user_input$filterTables$Diagnosis
    if ('icd9_code' %in% names(dx_filter_data)) { # user provided a specific diagnosis code = our lives are easy
-      query <- paste0(
-         "SELECT subject_id, hadm_id
-         FROM DIAGNOSES_ICD
-         WHERE icd9_code = ", dx_filter_data$icd9_code
-      )
+      query <- getTableQuery(table_name='DIAGNOSES_ICD', columns='subject_id, hadm_id', filter_column='icd9_code', filter_value=dx_filter_data$icd9_code)
       
    } else if ('long_title' %in% names(dx_filter_data)) {
-      query <- paste0(
-         "SELECT subject_id, hadm_id
-         FROM DIAGNOSES_ICD
-         LEFT JOIN D_ICD_DIAGNOSES ON icd9_code
-         WHERE D_ICD_DIAGNOSES.long_title like '%", dx_filter_data$long_title, "%'"
-      )
+      query <- getTableQuery(table_name='DIAGNOSES_ICD', columns='subject_id, hadm_id', join_type='LEFT', join_table='D_ICD_DIAGNOSES', join_column='icd9_code', filter_type='LIKE', filter_column='D_ICD_DIAGNOSES.long_title', filter_value=dx_filter_data$long_title)
    }
    
    # use generated query to get necessary data
@@ -56,23 +66,28 @@ if ('Diagnosis' %in% names(user_input$filterTables)) {
 
 
 if (any(user_input$select == 'Labs')) {
-   labs <- getTable('LABEVENTS', n=50000)
-   lab_names <- getTable('D_LABITEMS', n=50000)
-   
+   labevent_count <- paste0('SELECT itemid, COUNT(*) FROM LABEVENTS GROUP BY itemid LIMIT 50')
+   labevent_count <- dbGetQuery(conn001, labevent_count)
+   top50labs <- labevent_count$itemid
+
    # join lab values with current cohort
+   labs <- paste0(
+      'SELECT subject_id, hadm_id, valuenum, D_LABITEMS.label 
+      FROM LABEVENTS LEFT JOIN D_LABITEMS ON itemid
+      WHERE subject_id IN (', paste(cohort$subject_id, collapse = ', '), ') 
+         AND hadm_id IN (', paste(cohort$hadm_id, collapse = ', '), ')
+         AND itemid IN (', paste(top50labs, collapse = ', '), ')')
+   labs <- dbGetQuery(conn001, labs)
+
    labs <- inner_join(
       x = cohort,
-      y = labs %>% select(subject_id, hadm_id, itemid, valuenum),
+      y = labs %>% select(subject_id, hadm_id, valuenum, label),
       relationship = 'many-to-many',
       by = join_by(subject_id, hadm_id)
    )
    
    # convert itemid to human readable lab names
-   labs <- left_join(
-      x = labs, 
-      y = lab_names %>% select(itemid, label), 
-      by = join_by(itemid)
-   ) %>%
+   labs <- labs %>%
       mutate(label = paste0('LAB_', gsub(' ', '', label)))
    
    # aggregate each lab per visit (hadm_id)
@@ -90,7 +105,7 @@ if (any(user_input$select == 'Labs')) {
          names_from = label
       )
    
-   cohort <- labs
+   labs
 }
 
 
@@ -148,4 +163,4 @@ write.csv(cohort, file = "parsed_input.csv", row.names = FALSE)
 # move that from job directory back to project directory
 system('dx upload parsed_input.csv --wait')
 
-dbDisconnect(conn)
+dbDisconnect(conn001)
