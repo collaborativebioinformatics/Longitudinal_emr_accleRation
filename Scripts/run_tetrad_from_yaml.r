@@ -15,6 +15,7 @@ knowledge <- yaml_data$tetrad_args$knowledge
 test <- yaml_data$tetrad_args$test
 numberResampling <- yaml_data$tetrad_args$numberResampling
 delimiter <- yaml_data$tetrad_args$delimiter
+prefix <- yaml_data$tetrad_args$prefix
 
 # Construct the tetrad_command
 tetrad_command <- paste0("java -jar ./causal-cmd-1.12.0-jar-with-dependencies.jar",
@@ -23,16 +24,11 @@ tetrad_command <- paste0("java -jar ./causal-cmd-1.12.0-jar-with-dependencies.ja
                          " --dataset ", dataset,
                          " --delimiter ", delimiter,
                          # " --metadata ", paste0(getwd(), "/metadata_v01.txt"),
-                         " --knowledge ", knowledge),
                          " --test ", test,
                          " --alpha ", alpha,
                          " --score ", score,
-                         " --numberResampling ", numberResampling)
-
-# Add --knowledge argument only if a knowledge file is specified
-if (!is.null(knowledge) && nchar(knowledge) > 0) {
-  tetrad_command <- paste0(tetrad_command, " --knowledge ", knowledge)
-}
+                         " --numberResampling ", numberResampling,
+                         " --prefix ", prefix)
 
 # Print the command for debugging purposes
 print(tetrad_command)
