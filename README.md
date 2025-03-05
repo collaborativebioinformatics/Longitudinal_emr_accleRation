@@ -34,7 +34,7 @@ More information regarding Java installation can be found HERE[HERE](https://www
 ## Latest R Versin 
 sudo apt install r-base
 
-More information regarding R installatin can be found HERE![HERE!](https://rstudio-education.github.io/hopr/starting.html "HERE!") 
+More information regarding R installatin can be found HERE[HERE](https://rstudio-education.github.io/hopr/starting.html "HERE!") 
 
 ### .jar file for running Causaml-cmd on terminal (Tetrad command line option) 
 wget https://s01.oss.sonatype.org/content/repositories/releases/io/github/cmu-phil/causal-cmd/1.12.0/causal-cmd-1.12.0-jar-with-dependencies.jar
