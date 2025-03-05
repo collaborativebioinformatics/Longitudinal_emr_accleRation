@@ -49,6 +49,6 @@ More information regarding R installatin can be found [HERE](https://rstudio-edu
 ---
 ### Knowledge File 
 
-####To add knowledge parameters the user must create a `knowledge.txt` file. This option enables the user to input background knowledge regarding the data. For example. information about the time order of the measured variables. Please see knowledge.txt for reference. 
+####To add knowledge parameters the user must create a `knowledge.txt` file. This option enables the user to input background knowledge regarding the data. For example. information about the time order of the measured variables. Please see ['knowledge.txt'](https://github.com/collaborativebioinformatics/Longitudinal_emr_accleRation/blob/main/example_user_input/knowledge.txt "knowledge.txt") for reference. 
 
 
