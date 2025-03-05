@@ -167,18 +167,31 @@ Graph Edges:
 ----
 # Interpretation of Results 
 A --> B
+
 present
+
 A is a cause of B. It may be a direct or indirect cause that may include other measured variables. Also, there may be an unmeasured confounder of A and B.
+
 absent
+
 B is not a cause of A.
+
 A <-> B
+
 present
+
 There is an unmeasured variable (call it L) that is a cause of A and B. There may be measured variables along the causal pathway from L to A or from L to B.
+
 absent
+
 A is not a cause of B. B is not a cause of A.
+
  A o-> B
+ 
 present
+
  Either A is a cause of B, or there is an unmeasured variable that is a cause of A and B, or both.
+ 
  absent
 
 
