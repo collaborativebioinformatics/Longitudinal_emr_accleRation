@@ -1,4 +1,4 @@
-# Longitudinal Public Health Data Analysis
+# Rapid Longitudinal Analysis of Public Health Data 
 ---
 This project was part of the March 2025 [CMU Hackathon](https://guides.library.cmu.edu/hackathon "CMU Hackathon") in partnership with [DNAnexus](https://www.dnanexus.com "DNAnexus").
 
