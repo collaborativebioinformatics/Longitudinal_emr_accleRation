@@ -25,3 +25,14 @@ writeLines(as.yaml(list('filterTables' = list('Diagnosis' = list('long_title' = 
 #    --numCategories <integer>   Number of categories for discrete variables (min = 2)
 
 #a full list of tetrad commands can be visualized by --help-all in tetrad command line 
+
+
+
+###NOTE TO ADD KNOWLEDGE PARAMETERS 
+#USER Must create knowledge.txt file to enter background knowledge. 
+#For example, information about the time order of the measured variables
+#please see knowledge.txt in example_usr_input for reference 
+
+#more information regarding this: 
+#https://www.phil.cmu.edu/projects/tetrad/old/tet3/chp4.htm
+#https://bd2kccd.github.io/docs/causal-cmd/
