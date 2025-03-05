@@ -4,7 +4,7 @@ library(yaml)
 writeLines(as.yaml(list('filterTables' = list('Diagnosis' = list('long_title' = 'Pneumonia')),
                         'select' = list('Labs'),
                         'outcome' = list('Mortality'),
-                        'tetrad_args' = list('algorithm' = 'grasp-fci','alpha' = 0.01,'data-type' = 'mixed', 'dataset'='Retention.txt', 'prefix'='example_output_name','numberResampling'= 0,'delimiter' = 'tab','score' = 'cg-bic-score','test' = 'cg-lr-test'))),
+                        'tetrad_args' = list('algorithm' = 'grasp-fci','alpha' = 0.01,'datatype' = 'continuous', 'dataset'='temp.csv', 'prefix'='example_output_name','numberResampling'= 0,'delimiter' = 'comma','score' = 'cg-bic-score','test' = 'cg-lr-test'))),
            'user_input_yaml.txt')
 
 
