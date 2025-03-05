@@ -15,7 +15,9 @@ This study presents a computational pipeline that can utilize large EHR datasets
 
 ## What is Tetrad 
 
-Tetrad [Tetrad](https://www.cmu.edu/dietrich/philosophy/tetrad/#:~:text=Tetrad%20is%20a%20software%20suite,via%20R%20with%20Rpy%2DTetrad "Tetrad") is a software suite for simulating, estimating, and searching for graphical causal models of statistical data.
+Tetrad [Tetrad](https://www.cmu.edu/dietrich/philosophy/tetrad/#:~:text=Tetrad%20is%20a%20software%20suite,via%20R%20with%20Rpy%2DTetrad "Tetrad") is a software suite for simulating, estimating, and searching for graphical causal models of statistical data. The aim of the program is to provide sophisticated methods in a friendly interface requiring very little statistical sophistication of the user and no programming knowledge. Tetrad is open-source, free software that performs many of the functions in commercial programs.
+
+[See here for Tetrad User Manual](https://htmlpreview.github.io/?https:///github.com/cmu-phil/tetrad/blob/development/tetrad-lib/src/main/resources/docs/manual/index.html "See here for Tetrad User Manual")
 
  
 ---
@@ -25,7 +27,7 @@ Tetrad [Tetrad](https://www.cmu.edu/dietrich/philosophy/tetrad/#:~:text=Tetrad%2
 
 
 ----
-## Installation  
+## Installation Prior to Pipeline
 ### Latest Java Version 
 `sudo apt install openjdk-17-jdk`
 
@@ -38,3 +40,5 @@ More information regarding R installatin can be found [HERE](https://rstudio-edu
 ***
 ### .jar file for running Causaml-cmd on terminal (Tetrad command line option) 
 `wget https://s01.oss.sonatype.org/content/repositories/releases/io/github/cmu-phil/causal-cmd/1.12.0/causal-cmd-1.12.0-jar-with-dependencies.jar`
+
+
