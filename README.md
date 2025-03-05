@@ -46,7 +46,7 @@ More information regarding R installatin can be found [HERE](https://rstudio-edu
 # Files Needed Prior to Pipeline 
 ### YAML file to specify variables (eg specific columns) and specific arguments to input into Tetrad
 
-#### Please see [Example User Input Folder](https://github.com/collaborativebioinformatics/Longitudinal_emr_accleRation/tree/main/example_user_input "Example User Input Folder") for example R script to output this file and example of file format. NOTE-examples of specific arguments and options can be found in the R script file. 
+#### Please see [Example User Input Folder](https://github.com/collaborativebioinformatics/Longitudinal_emr_accleRation/tree/main/example_user_input "Example User Input Folder") for example R script: [GenerateExampleUserInput.R](https://github.com/collaborativebioinformatics/Longitudinal_emr_accleRation/blob/main/example_user_input/GenerateExampleUserInput.R "GenerateExampleUserInput.R") to output this file and example of file format. NOTE-examples of specific arguments and options can be found in the R script file. 
 ---
 ### Knowledge File 
 
