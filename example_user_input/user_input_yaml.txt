@@ -5,4 +5,14 @@ select:
 - Labs
 outcome:
 - Mortality
+tetrad_args:
+  algorithm: grasp-fci
+  alpha: 0.01
+  data-type: mixed
+  dataset: Retention.txt
+  prefix: example_output_name
+  numberResampling: 0
+  delimiter: tab
+  score: cg-bic-score
+  test: cg-lr-test
 

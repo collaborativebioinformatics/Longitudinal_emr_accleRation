@@ -1,0 +1,26 @@
+#User has the option --knowledge <arg>, with which can specify the prior knowledge file. Below is the content of a sample prior knowledge file:
+
+
+/knowledge
+
+addtemporal
+1 spending_per_stdt fac_salary stdt_tchr_ratio 
+2 rjct_rate stdt_accept_rate 
+3 tst_scores stdt_clss_stndng 
+4* grad_rate 
+
+forbiddirect
+x3 x4
+
+requiredirect
+x1 x2
+
+
+
+#NOTE 
+#The first line of the prior knowledge file must say /knowledge. And a prior knowledge file consists of three sections:
+#addtemporal - tiers of variables where the first tier preceeds the last. Adding a asterisk next to the tier id prohibits edges between tier variables
+#forbiddirect - forbidden directed edges indicated by a list of pairs of variables: from -> to direction
+#requireddirect - required directed edges indicated by a list of pairs of variables: from -> to direction
+
+#more information: https://bd2kccd.github.io/docs/causal-cmd/
