@@ -1,18 +1,24 @@
+install.packages(c('DBI', 'RSQLite'))
+
 library(dplyr)
 library(yaml)
 library(tidyr)
 library(RSQLite)
 library(DBI)
 
-
-# pull down SQLite database
 system('dx download mimic3.sqlite')
+
 conn001 <- dbConnect(SQLite(), 'mimic3.sqlite')
+
+# create list structure to which we will add features & outcome dataframes separately
+features_list <- list()
+outcomes_list <- list()
 
 # Read user input data
 project_dir <- '/../mnt/project/'
-user_input <- read_yaml(paste0(project_dir, 'ip.txt'))
 
+# Change the input file name 
+user_input <- read_yaml(paste0(project_dir, 'ip.txt'))
 
 getTableQuery <- function(table_name, columns, join_type='', join_table='', join_column='', filter_type='=', filter_column='', filter_value='', n=...) {
    query <- paste0('SELECT ', columns, ' FROM ', table_name)
@@ -36,9 +42,6 @@ getTableQuery <- function(table_name, columns, join_type='', join_table='', join
    
    return(dbGetQuery(conn001, query))
 }
-
-
-
 
 # filter down to requested cohort based on diagnosis
 if ('Diagnosis' %in% names(user_input$filterTables)) {
@@ -66,21 +69,10 @@ if ('Diagnosis' %in% names(user_input$filterTables)) {
    cohort <- dbGetQuery(conn001, query)
 }
 
-
-# TODO: filter down other tables to subject_id's in this cohort
-# admissions, patients, icustays
-
-
-
-##### GET FEATURES FOR CAUSAL SEARCH #####
-
-# TODO: add more feature sets
-features_list <- list()
-
 # LAB VALUES
 if ('Labs' %in% user_input$select) {
    # only take 50 most commonly measured lab tests
-   labevent_count <- paste0('SELECT itemid, COUNT(*) FROM LABEVENTS GROUP BY ORDER BY COUNT(*) DESC LIMIT 50')
+   labevent_count <- paste0('SELECT itemid, COUNT(*) FROM LABEVENTS GROUP BY itemid ORDER BY COUNT(*) DESC LIMIT 50')
    labevent_count <- dbGetQuery(conn001, labevent_count)
    top50labs <- labevent_count$itemid
    
@@ -88,10 +80,10 @@ if ('Labs' %in% user_input$select) {
    # only query for the subject_id and hadm_id in our current cohort
    labs <- paste0(
       'SELECT subject_id, hadm_id, valuenum, D_LABITEMS.label 
-      FROM LABEVENTS LEFT JOIN D_LABITEMS ON itemid
+      FROM LABEVENTS LEFT JOIN D_LABITEMS ON LABEVENTS.itemid = D_LABITEMS.itemid
       WHERE subject_id IN (', paste(cohort$subject_id, collapse = ', '), ') 
          AND hadm_id IN (', paste(cohort$hadm_id, collapse = ', '), ')
-         AND itemid IN (', paste(top50labs, collapse = ', '), ')')
+         AND LABEVENTS.itemid IN (', paste(top50labs, collapse = ', '), ')')
    labs <- dbGetQuery(conn001, labs)
    
    # join lab values with current cohort
@@ -125,7 +117,6 @@ if ('Labs' %in% user_input$select) {
    features_list[['Labs']] <- labs
 }
 
-
 # TODO: fix this!
 if ('Diagnoses' %in% user_input$select) {
    top50icd <- dbGetQuery(conn001, 'SELECT icd9_code, COUNT(*) FROM DIAGNOSES_ICD GROUP BY icd9_code ORDER BY COUNT(*) DESC LIMIT 50')
@@ -148,21 +139,12 @@ if ('Diagnoses' %in% user_input$select) {
 
 if ('Micro_data' %in% user_input$select) {
    # TODO: this!
-   
+   micro_data = data.frame()
    
    features_list[['Micro_data']] <- micro_data
 }
 
-
-
-
-
-
-#### ENCODE OUTCOMES ####
-# create list structure to which we will add outcome dataframes separately
-outcomes_list <- list()
-
-if (any(user_input$outcomes %in% c('Mortality', 'Readmission', 'Length_of_stay'))) {
+if (any(user_input$outcome %in% c('Mortality', 'Readmission', 'Length_of_stay'))) {
    admissions_query <- paste0("
       SELECT *
       FROM ADMISSIONS
@@ -173,7 +155,7 @@ if (any(user_input$outcomes %in% c('Mortality', 'Readmission', 'Length_of_stay')
 }
 
 
-if (any(user_input$outcomes == 'Mortality')) {
+if (any(user_input$outcome == 'Mortality')) {
    mortality_data <- admissions_data %>%
       mutate(mortality_in_hospital = as.numeric(hospital_expire_flag)) %>% 
       select(subject_id, hadm_id, mortality_in_hospital)
@@ -182,7 +164,7 @@ if (any(user_input$outcomes == 'Mortality')) {
 }
 
 # TODO: user should specify readmission within X days
-if ('Readmission' %in% user_input$outcomes) {
+if ('Readmission' %in% user_input$outcome) {
    readmission_data <- admissions_data %>%
       mutate(
          admittime = as.POSIXct(admittime, format="%Y-%m-%d %H:%M:%S"),
@@ -202,7 +184,7 @@ if ('Readmission' %in% user_input$outcomes) {
 }
 
 
-if ('Length_of_stay' %in% user_input$outcomes) {
+if ('Length_of_stay' %in% user_input$outcome) {
    los_data <- admissions_data %>%
       mutate(
          los_days = as.numeric(difftime(dischtime, admittime, units = "days"))  # Compute LOS in days
@@ -213,7 +195,7 @@ if ('Length_of_stay' %in% user_input$outcomes) {
 }
 
 
-if ('icu_transfers' %in% user_input$outcomes) {
+if ('icu_transfers' %in% user_input$outcome) {
    # TODO: check to make sure count - 1 works
    icu_stays_query <- paste0("
       SELECT subject_id, hadm_id, COUNT(icu_transfers) - 1
@@ -226,7 +208,6 @@ if ('icu_transfers' %in% user_input$outcomes) {
    
    outcomes_list[['icu_transfers']] <- icu_transfers_data %>% arrange(subject_id, hadm_id)
 }
-
 
 # COMBINE OUTCOMES into one data.frame, if there is more than one outcome and the user requested combining them
 if (length(outcomes_list) == 1L) { # single outcome dataframe, keep it in list structure
@@ -256,14 +237,10 @@ if (length(outcomes_list) == 1L) { # single outcome dataframe, keep it in list s
    num_outcomes <- length(outcomes_list)
 }
 
-
-
-
-
-
 ### COMBINE FEATURE SETS AND OUTCOME(S) DATA, depending on user input
 # WRITE DATASETS TO CSV FOR INPUT TO TETRAD
 num_feat_sets <- length(features_list)
+num_outcomes <- length(outcomes_list)
 
 combine_outcome_feature_writecsv <- function(featDF, outDF, filename) {
    data <- inner_join(
@@ -274,42 +251,33 @@ combine_outcome_feature_writecsv <- function(featDF, outDF, filename) {
       select(-subject_id, -hadm_id)
    
    write.csv(data, 
-             file = paste0(directory_name, filename, '.csv'), 
-             quote = FALSE,
+             file = paste0(filename, '.csv'), 
+             # quote = FALSE,
              row.names = FALSE)
 }
 
-
 # TODO: change the filenames to something meaningful
 if (num_feat_sets == 1L && num_outcomes == 1L) {
-   combine_outcome_feature_writecsv(features_list[[1]], outcomes_data, '')
+   combine_outcome_feature_writecsv(features_list[[1]], outcomes_list[[1]], 'option1')
    
 } else if (num_feat_sets > 1L && num_outcomes == 1L) {
    for (i in seq_along(features_list)) {
-      combine_outcome_feature_writecsv(features_list[[i]], outcomes_data, '')
+      combine_outcome_feature_writecsv(features_list[[i]], outcomes_list[[1]], paste0('option',i))
    }
    
 } else if (num_feat_sets == 1L && num_outcomes > 1L) {
    for (i in seq_along(outcomes_data)) {
-      combine_outcome_feature_writecsv(features_list[[1]], outcomes_data[[i]], '')
+      combine_outcome_feature_writecsv(features_list[[1]], outcomes_list[[i]], paste0('option',i))
    }
    
 } else if (num_feat_sets > 1L && num_outcomes > 1L) {
    for (i in seq_along(features_list)) {
       for (j in seq_along(outcomes_data)) {
-         combine_outcome_feature_writecsv(features_list[[i]], outcomes_data[[j]], '')
+         combine_outcome_feature_writecsv(features_list[[i]], outcomes_list[[j]], paste0('option',i,'_',j))
       }
    }
 }
 
-
-
-# move that from job directory back to project directory??
-# system('dx upload parsed_input.csv --wait')
-
+system('dx upload temp.csv --wait')
 
 dbDisconnect(conn001)
-
-
-
-
